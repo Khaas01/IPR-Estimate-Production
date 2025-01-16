@@ -1,14 +1,14 @@
 // Global variables
 let isSubmitting = false;
 let sectionHistory = []; // Initialize sectionHistory
-
+let currentEditRow = null;
 // Centralized API configuration
 
 const SHEET_ID = "1fM11c84e-D01z3hbpjLLl2nRaL2grTkDEl5iGsJDLPw";
 const SHEET_NAME = "Form Responses";
 
 const API_CONFIG = {
-    GOOGLE_APPS_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbwOCAIWr3ohEsDE91BGXMP4tHz9wagzaILi6Z_qeIZ_bJixP_SG7YHQjxugyojXTuQ5Uw/exec',
+    GOOGLE_APPS_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbz7PUyotzCnbzjPFtjcnYiHnwf6exjynu3MIJSapJzOYdvyLhhChI5zbDw6dUi740G0Pw/exec',
     API_KEY: 'AIzaSyDFVaRrTxOyR-fX3XAOp1tjoeg58mkj254',
     CLIENT_ID: '900437232674-krleqgjop3u7cl4sggmo20rkmrsl5vh5.apps.googleusercontent.com',
     REDIRECT_URI: 'https://khaas01.github.io/IPR-estimate/',
@@ -533,7 +533,26 @@ function validateForm(formData) {
 
     return true;
 }
+let currentPdfId = null; // Add at the top with other global variables
 
+function editForm() {
+    // Get the current row from the sheet based on PDF_ID
+    const previewFrame = document.getElementById('estimatePreviewFrame');
+    if (previewFrame && previewFrame.src) {
+        const pdfId = previewFrame.src.match(/\/d\/(.+?)\/preview/)?.[1];
+        if (pdfId) {
+            // Store the PDF_ID for later use
+            currentEditRow = pdfId;
+        }
+    }
+    
+    hideAllSections();
+    sectionHistory = ['salesRepSection'];
+    const firstSection = document.getElementById('salesRepSection');
+    if (firstSection) {
+        firstSection.style.display = 'block';
+    }
+}
 function displayPDF(pdfId) {
     const previewFrame = document.getElementById('estimatePreviewFrame');
     if (previewFrame && pdfId) {
@@ -704,8 +723,9 @@ function submitForm() {
                 "Solar Detach/Reset Cost": formData["Solar Detach/Reset Cost"],
                 "Amount Collected": formData["Amount Collected"],
                 "Unforseen Additions": formData["Unforseen Additions"],
-                "PDF_ID": formData["PDF_ID"]
-            }
+                "PDF_ID": currentEditRow || '' // Include the current edit row if it exists
+            },
+            editRow: currentEditRow // Add this to indicate we're editing
         };
 
         console.log('Sending structured form data:', submissionData);
@@ -1154,4 +1174,5 @@ async function getDecodedServiceAccountCredentials() {
         throw new Error('Failed to initialize service account credentials');
     }
 }
+
 

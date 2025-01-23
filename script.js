@@ -49,6 +49,43 @@ async function initializeGoogleAPIs() {
         return false;
     }
 }
+// Replace your current initMap function with this:
+function initMap() {
+    // Delay the initialization slightly to ensure DOM is ready
+    setTimeout(() => {
+        const addressInput = document.getElementById('ownerAddress');
+        if (!addressInput) {
+            console.warn('Address input not found, skipping autocomplete initialization');
+            return;
+        }
+
+        try {
+            const autocomplete = new google.maps.places.Autocomplete(addressInput, {
+                types: ['address'],
+                componentRestrictions: { country: 'us' }
+            });
+
+            autocomplete.addListener('place_changed', function() {
+                const place = autocomplete.getPlace();
+                if (!place.geometry) {
+                    console.warn('No place details available');
+                    return;
+                }
+                fillInAddress(place);
+            });
+
+        } catch (error) {
+            console.error('Failed to initialize Places Autocomplete:', error);
+            handleMapError();
+        }
+    }, 100);
+}
+
+// Add this to your HTML file:
+<script async defer
+    src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=places&callback=initMap"
+    onerror="handleMapError()">
+</script>
 function toggleMenu() {
     const navMenu = document.querySelector('.nav-menu');
     const menuToggle = document.querySelector('.menu-toggle');

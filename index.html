@@ -3,11 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/x-icon" href="https://i.imgur.com/kj09wS4.png">
     <script src="https://apis.google.com/js/api.js"></script>
     <script src="https://accounts.google.com/gsi/client"></script>
     <title>Iron Peak Roofing - Estimate Form</title>
     <link rel="stylesheet" href="styles.css">
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDFVaRrTxOyR-fX3XAOp1tjoeg58mkj254&libraries=places"></script>
+    <script>
+        function gm_authFailure() {
+            console.error('Google Maps API authentication failed');
+        }
+        function initMap() {
+            console.log('Google Maps API loaded successfully');
+            if (typeof initializeAutocomplete === 'function') {
+                initializeAutocomplete();
+            }
+        }
+        window.initMap = initMap;  // Make it globally available
+    </script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDFVaRrTxOyR-fX3XAOp1tjoeg58mkj254&libraries=places&callback=initMap&v=weekly" async defer></script>
     <script src="script.js" defer></script>
 </head>
     

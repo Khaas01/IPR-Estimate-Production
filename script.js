@@ -134,14 +134,6 @@ document.addEventListener('DOMContentLoaded', loadGoogleMapsScript);
 
 
 // ===========================================
-// Google Maps Integration
-// ===========================================
-window.initMap = function() {
-    console.log('Google Maps API loaded successfully');
-    initializeAutocomplete();
-};
-
-// ===========================================
 // Event Listeners
 // ===========================================
 window.toggleMenu = Navigation.toggleMenu;
@@ -251,16 +243,6 @@ solarRadios.forEach(radio => {
         }
     });
 });
-window.initMap = function() {
-    if (document.readyState === 'complete') {
-        initializeAutocomplete();
-    } else {
-        window.addEventListener('load', initializeAutocomplete);
-    }
-};
-
-// Initialize when the page loads
-document.addEventListener('DOMContentLoaded', initializeAutocomplete);
 
 // Helper function to fill in address components
 function fillInAddress(place) {

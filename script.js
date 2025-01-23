@@ -25,7 +25,7 @@ const CONFIG = {
 // ===========================================
 const state = {
     isSubmitting: false,
-    sectionHistory: [],
+    sectionHistory: ['salesRepSection'],
     currentEditRow: null
 };
 
@@ -296,9 +296,6 @@ function fillInAddress(place) {
     }
 }
 
-// Initialize autocomplete when page loads
-document.addEventListener('DOMContentLoaded', initializeAutocomplete);
-// Function to hide all sections - keep it simple and efficient
 function hideAllSections() {
     console.log('Hiding all sections');
     document.querySelectorAll('div[id$="Section"], div[id*="-section"]').forEach(section => {

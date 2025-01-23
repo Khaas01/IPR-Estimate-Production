@@ -49,6 +49,35 @@ async function initializeGoogleAPIs() {
         return false;
     }
 }
+function toggleMenu() {
+    const navMenu = document.querySelector('.nav-menu');
+    const menuToggle = document.querySelector('.menu-toggle');
+    
+    if (navMenu && menuToggle) {
+        navMenu.classList.toggle('active');
+        menuToggle.classList.toggle('active');
+        
+        // Toggle ARIA-expanded state
+        const isExpanded = navMenu.classList.contains('active');
+        menuToggle.setAttribute('aria-expanded', isExpanded);
+    }
+}
+
+// Add click outside listener to close menu when clicking outside
+document.addEventListener('click', function(event) {
+    const navMenu = document.querySelector('.nav-menu');
+    const menuToggle = document.querySelector('.menu-toggle');
+    
+    if (navMenu && menuToggle) {
+        const isClickInside = navMenu.contains(event.target) || menuToggle.contains(event.target);
+        
+        if (!isClickInside && navMenu.classList.contains('active')) {
+            navMenu.classList.remove('active');
+            menuToggle.classList.remove('active');
+            menuToggle.setAttribute('aria-expanded', 'false');
+        }
+    }
+});
 function adjustIframeHeight() {
     const container = document.querySelector('.estimate-preview-container');
     const iframe = document.getElementById('estimatePreviewFrame');

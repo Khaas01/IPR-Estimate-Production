@@ -8,7 +8,8 @@
     <title>Iron Peak Roofing - Estimate Form</title>
     <script src="script.js" defer></script>
     <link rel="stylesheet" href="styles.css">
-  
+    <!-- Add this just before </body> -->
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDFVaRrTxOyR-fX3XAOp1tjoeg58mkj254&libraries=places"></script>
 </head>
     
 <body>
@@ -16,15 +17,15 @@
     <img src="https://i.imgur.com/kj09wS4.png" alt="Iron Peak Roofing Logo" class="logo">
     <h1>Roofing Estimate Form</h1>
 
-<nav class="nav-container">
-    <button class="menu-toggle" onclick="toggleMenu()" aria-label="Toggle Menu">
-        <span class="hamburger"></span>
-    </button>
-    <ul class="nav-menu">
-        <li><a href="#" onclick="showSection('salesRepSection'); return false;">Home</a></li>
-        <li><a href="#" onclick="showSection('measureRoofSection'); return false;">Measurement</a></li>
-    </ul>
-</nav>
+<nav>
+        <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="form.html">Estimate Form</a></li>
+            <li><a href="review.html">Review Estimate</a></li>
+            <li><a href="mia.html">Mia Chatbot</a></li>
+            <li><a href="#" onclick="showMeasurementSection()">Measurement</a></li>
+        </ul>
+    </nav>
 </header>
 <form id="estimateForm">
    <!--Sales Rep Section -->
@@ -831,7 +832,6 @@
 </div>
 </form>
 <iframe name="hidden_iframe" id="hidden_iframe" style="display:none;"></iframe>
-<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDFVaRrTxOyR-fX3XAOp1tjoeg58mkj254&libraries=places&callback=initMap" async defer></script>
 
 </body>
 </html>

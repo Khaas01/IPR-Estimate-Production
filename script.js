@@ -80,39 +80,40 @@ const Navigation = {
 };
 // Add this to your script.js
 function initMap() {
-    // Check if the required elements exist before initializing
-    if (!document.getElementById('ownerAddress')) {
-        console.warn('Address input element not found');
-        return;
-    }
-
     try {
-        const autocomplete = new google.maps.places.Autocomplete(
-            document.getElementById('ownerAddress'),
-            {
-                types: ['address'],
-                componentRestrictions: { country: 'us' }
-            }
-        );
+        const addressInput = document.getElementById('ownerAddress');
+        if (!addressInput) {
+            console.warn('Address input element not found');
+            return;
+        }
+
+        const autocomplete = new google.maps.places.Autocomplete(addressInput, {
+            types: ['address'],
+            componentRestrictions: { country: 'us' }
+        });
 
         autocomplete.addListener('place_changed', function() {
             const place = autocomplete.getPlace();
+            if (!place.geometry) {
+                console.warn('Place details not found for input: ', addressInput.value);
+                return;
+            }
             fillInAddress(place);
         });
     } catch (error) {
         console.error('Error initializing Google Maps:', error);
+        handleMapError();
     }
 }
 
-// Add error handling for Google Maps loading
-window.gm_authFailure = function() {
-    console.error('Google Maps authentication failed. Please check your API key.');
-    // Optionally disable the address autocomplete and fall back to manual input
+function handleMapError() {
     const addressInput = document.getElementById('ownerAddress');
     if (addressInput) {
-        addressInput.removeAttribute('disabled');
+        addressInput.setAttribute('placeholder', 'Enter address manually');
+        // Remove autocomplete functionality
+        addressInput.setAttribute('autocomplete', 'off');
     }
-};
+}
 function loadGoogleMapsScript() {
     const script = document.createElement('script');
     script.src = `https://maps.googleapis.com/maps/api/js?key=${CONFIG.GOOGLE_MAPS_API_KEY}&libraries=places&callback=initMap`;

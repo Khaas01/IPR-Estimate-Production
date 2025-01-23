@@ -82,7 +82,7 @@ function initMap() {
 }
 
 // Add this to your HTML file:
-<script async defer
+<script> async defer
     src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=places&callback=initMap"
     onerror="handleMapError()">
 </script>

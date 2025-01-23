@@ -856,6 +856,30 @@
     // Make initMap available globally
     window.initMap = initMap;
 </script>
+    <script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Set up hamburger menu click handler
+    const menuToggle = document.querySelector('.menu-toggle');
+    if (menuToggle) {
+        menuToggle.addEventListener('click', function(e) {
+            e.stopPropagation();
+            this.classList.toggle('active');
+            document.querySelector('.nav-menu').classList.toggle('active');
+        });
+    }
+
+    // Set up click outside to close menu
+    document.addEventListener('click', function(event) {
+        const navMenu = document.querySelector('.nav-menu');
+        const menuToggle = document.querySelector('.menu-toggle');
+        if (navMenu && navMenu.classList.contains('active') && 
+            !event.target.closest('.nav-container')) {
+            navMenu.classList.remove('active');
+            menuToggle.classList.remove('active');
+        }
+    });
+});
+</script>
 
 <!-- Load Google Maps API with proper callback -->
 <script

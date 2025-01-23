@@ -11,6 +11,22 @@ header {
     padding: 20px;
     width: 100%;
     background-color: #f9f9f9;
+     min-height: 80px; 
+}
+header .logo {
+    max-width: 150px;
+    height: auto;
+    margin: 0 0 10px 0; /* Update margin to be more specific */
+    display: block; /* Ensure block display */
+}
+.logo-title {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    margin: 0 auto;
+    padding: 0 40px; /* Add padding to account for the hamburger menu */
 }
 
 /* Update the nav-container positioning */

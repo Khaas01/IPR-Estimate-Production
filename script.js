@@ -259,52 +259,6 @@ window.initMap = function() {
     }
 };
 
-function initializeAutocomplete() {
-    const addressInput = document.getElementById('ownerAddress');
-    const autocomplete = new google.maps.places.Autocomplete(addressInput, {
-        // Restrict to getting just address components
-        types: ['address'],
-        // Restrict to USA addresses
-        componentRestrictions: { country: 'us' }
-    });
-    
-    autocomplete.addListener('place_changed', function() {
-        const place = autocomplete.getPlace();
-        if (!place.geometry) {
-            return;
-        }
-        
-        // Get only street address components
-        let streetNumber = '';
-        let streetName = '';
-        
-        for (const component of place.address_components) {
-            const type = component.types[0];
-            
-            if (type === 'street_number') {
-                streetNumber = component.long_name;
-            }
-            if (type === 'route') {
-                streetName = component.long_name;
-            }
-            // Still fill in the other fields
-            if (type === 'locality') {
-                document.getElementById('ownerCity').value = component.long_name;
-            }
-            if (type === 'administrative_area_level_1') {
-                document.getElementById('ownerState').value = component.short_name;
-            }
-            if (type === 'postal_code') {
-                document.getElementById('ownerZip').value = component.long_name;
-            }
-        }
-        
-        // Set only the street address in the address field
-        const streetAddress = `${streetNumber} ${streetName}`.trim();
-        addressInput.value = streetAddress;
-    });
-}
-
 // Initialize when the page loads
 document.addEventListener('DOMContentLoaded', initializeAutocomplete);
 

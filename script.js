@@ -156,53 +156,54 @@ solarRadios.forEach(radio => {
     });
 });
 function initializeAutocomplete() {
-    const addressInput = document.getElementById('ownerAddress');
-    const autocomplete = new google.maps.places.Autocomplete(addressInput, {
-        // Restrict to getting just address components
-        types: ['address'],
-        // Restrict to USA addresses
-        componentRestrictions: { country: 'us' }
-    });
-    
-    autocomplete.addListener('place_changed', function() {
-        const place = autocomplete.getPlace();
-        if (!place.geometry) {
+    try {
+        const addressInput = document.getElementById('ownerAddress');
+        if (!addressInput) {
+            console.error('Address input element not found');
             return;
         }
-        
-        // Get only street address components
-        let streetNumber = '';
-        let streetName = '';
-        
-        for (const component of place.address_components) {
-            const type = component.types[0];
-            
-            if (type === 'street_number') {
-                streetNumber = component.long_name;
-            }
-            if (type === 'route') {
-                streetName = component.long_name;
-            }
-            // Still fill in the other fields
-            if (type === 'locality') {
-                document.getElementById('ownerCity').value = component.long_name;
-            }
-            if (type === 'administrative_area_level_1') {
-                document.getElementById('ownerState').value = component.short_name;
-            }
-            if (type === 'postal_code') {
-                document.getElementById('ownerZip').value = component.long_name;
-            }
+
+        if (!google || !google.maps || !google.maps.places) {
+            console.error('Google Maps Places API not loaded');
+            return;
         }
+
+        const autocomplete = new google.maps.places.Autocomplete(addressInput, {
+            types: ['address'],
+            componentRestrictions: { country: 'us' }
+        });
         
-        // Set only the street address in the address field
-        const streetAddress = `${streetNumber} ${streetName}`.trim();
-        addressInput.value = streetAddress;
-    });
+        // Add error handling for the listener
+        autocomplete.addListener('place_changed', function() {
+            try {
+                const place = autocomplete.getPlace();
+                if (!place.geometry) {
+                    console.warn('Place details not found for input: ', addressInput.value);
+                    return;
+                }
+                fillInAddress(place);
+            } catch (error) {
+                console.error('Error in place_changed listener:', error);
+            }
+        });
+
+        // Remove autocomplete functionality if something goes wrong
+        addressInput.setAttribute('autocomplete', 'off');
+        
+        console.log('Autocomplete initialized successfully');
+    } catch (error) {
+        console.error('Error initializing autocomplete:', error);
+        handleMapError();
+    }
 }
 
-// Initialize when the page loads
-document.addEventListener('DOMContentLoaded', initializeAutocomplete);
+function handleMapError() {
+    const addressInput = document.getElementById('ownerAddress');
+    if (addressInput) {
+        addressInput.setAttribute('placeholder', 'Enter address manually');
+        addressInput.setAttribute('autocomplete', 'off');
+    }
+}
 
 // Helper function to fill in address components
 function fillInAddress(place) {

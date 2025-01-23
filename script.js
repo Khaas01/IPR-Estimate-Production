@@ -251,6 +251,14 @@ solarRadios.forEach(radio => {
         }
     });
 });
+window.initMap = function() {
+    if (document.readyState === 'complete') {
+        initializeAutocomplete();
+    } else {
+        window.addEventListener('load', initializeAutocomplete);
+    }
+};
+
 function initializeAutocomplete() {
     const addressInput = document.getElementById('ownerAddress');
     const autocomplete = new google.maps.places.Autocomplete(addressInput, {

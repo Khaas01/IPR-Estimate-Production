@@ -10,19 +10,19 @@
     <script src="https://accounts.google.com/gsi/client"></script>
     <title>Iron Peak Roofing - Estimate Form</title>
     <link rel="stylesheet" href="styles.css">
+    <script src="script.js" defer></script>
     <script>
-        function gm_authFailure() {
-            console.error('Google Maps API authentication failed');
-        }
         function initMap() {
-            console.log('Google Maps API loaded successfully');
             if (typeof initializeAutocomplete === 'function') {
                 initializeAutocomplete();
             }
         }
-        window.initMap = initMap;  // Make it globally available
     </script>
-    <script src="script.js" defer></script>
+   <script
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDFVaRrTxOyR-fX3XAOp1tjoeg58mkj254&libraries=places&callback=initMap"
+    async
+    defer
+></script>
 </head>
     
 <body>

@@ -144,14 +144,6 @@ window.initMap = function() {
 // ===========================================
 // Event Listeners
 // ===========================================
-document.addEventListener('DOMContentLoaded', () => {
-    Navigation.preventMenuClose();
-});
-
-window.addEventListener('load', () => {
-});
-
-// Export any necessary functions or objects
 window.toggleMenu = Navigation.toggleMenu;
 function adjustIframeHeight() {
     const container = document.querySelector('.estimate-preview-container');

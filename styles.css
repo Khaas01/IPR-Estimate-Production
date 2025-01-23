@@ -2,63 +2,7 @@
 * {
     box-sizing: border-box;
 }
-/* Navigation Container */
-.nav-container {
-    position: absolute;
-    top: 20px;
-    right: 20px;
-    width: auto;  /* Change from 100% to auto */
-    background-color: transparent;  /* Change from #f9f9f9 to transparent */
-    border-bottom: none;  /* Remove the border */
-}
-.logo-title {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-/* Menu Toggle Button - Positioned in top right */
-.menu-toggle {
-    display: block;
-    background: none;
-    border: none;
-    padding: 10px;
-    cursor: pointer;
-    position: absolute;
-    top: 50%;
-    right: 20px;
-    transform: translateY(-50%);
-    z-index: 1001;
-}
-
-/* Hamburger Icon - Three lines with proper spacing */
-.hamburger {
-    width: 30px;
-    height: 3px;
-    background-color: #333;
-    position: relative;
-    transition: all 0.3s ease;
-}
-
-.hamburger::before,
-.hamburger::after {
-    content: '';
-    position: absolute;
-    width: 30px;
-    height: 3px;
-    background-color: #333;
-    transition: all 0.3s ease;
-}
-
-.hamburger::before {
-    top: -8px;
-}
-
-.hamburger::after {
-    top: 8px;
-}
-
-/* Header Layout */
+/* Reset the duplicate header styles and keep only these */
 header {
     position: relative;
     display: flex;
@@ -69,25 +13,88 @@ header {
     background-color: #f9f9f9;
 }
 
-
-header h1 {
-    margin: 10px 0;
+/* Update the nav-container positioning */
+.nav-container {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    padding: 0;
+    width: auto;
+    background-color: transparent;
+    border-bottom: none;
 }
 
-/* Navigation Menu */
+/* Update the menu-toggle button styles */
+.menu-toggle {
+    display: block;
+    background: none;
+    border: none;
+    padding: 0.5rem;
+    cursor: pointer;
+    position: relative;
+    z-index: 1000;
+    width: 40px;
+    height: 40px;
+}
+
+/* Update hamburger icon styles */
+.hamburger {
+    display: block;
+    position: relative;
+    width: 24px;
+    height: 2px;
+    background: #333;
+    margin: 0 auto;
+    transition: all 0.3s ease-in-out;
+}
+
+.hamburger::before,
+.hamburger::after {
+    content: '';
+    position: absolute;
+    width: 24px;
+    height: 2px;
+    background: #333;
+    left: 0;
+    transition: all 0.3s ease-in-out;
+}
+
+.hamburger::before {
+    top: -8px;
+}
+
+.hamburger::after {
+    bottom: -8px;
+}
+
+/* Update menu toggle animation */
+.menu-toggle.active .hamburger {
+    background: transparent;
+}
+
+.menu-toggle.active .hamburger::before {
+    transform: rotate(45deg);
+    top: 0;
+}
+
+.menu-toggle.active .hamburger::after {
+    transform: rotate(-45deg);
+    bottom: 0;
+}
+
+/* Update dropdown menu styles */
 .nav-menu {
     display: none;
     position: absolute;
-    top: 100%;
+    top: 45px;
     right: 0;
-    width: 200px; /* Fixed width for menu */
-    background-color: white;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    z-index: 1000;
-    padding: 0;
+    background: white;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
     margin: 0;
+    padding: 0;
     list-style: none;
-    border-radius: 4px;
+    min-width: 200px;
+    z-index: 999;
 }
 
 .nav-menu.active {
@@ -96,11 +103,7 @@ header h1 {
 
 .nav-menu li {
     margin: 0;
-    border-bottom: 1px solid #eee;
-}
-
-.nav-menu li:last-child {
-    border-bottom: none;
+    padding: 0;
 }
 
 .nav-menu a {
@@ -108,26 +111,11 @@ header h1 {
     padding: 12px 20px;
     color: #333;
     text-decoration: none;
-    font-size: 16px;
-    transition: all 0.3s ease;
+    transition: background-color 0.3s;
 }
 
 .nav-menu a:hover {
     background-color: #f5f5f5;
-    color: #0056b3;
-}
-
-/* Hamburger Animation */
-.menu-toggle.active .hamburger {
-    background-color: transparent;
-}
-
-.menu-toggle.active .hamburger::before {
-    transform: rotate(45deg) translate(5px, 5px);
-}
-
-.menu-toggle.active .hamburger::after {
-    transform: rotate(-45deg) translate(7px, -7px);
 }
 /* Review Section Container */
 #review-section {
@@ -352,6 +340,10 @@ label {
 .radio-group label {
     margin-bottom: 10px;
 }
+form {
+    padding-top: 60px; /* Add space at top for header and menu */
+}
+
 
 /* Form Section Styles */
 .form-section {

@@ -185,44 +185,36 @@ solarRadios.forEach(radio => {
     });
 });
 function initializeAutocomplete() {
+    // Wait for Google Maps API to be fully loaded
+    if (typeof google === 'undefined' || !google.maps || !google.maps.places) {
+        console.log('Waiting for Google Maps API to load...');
+        setTimeout(initializeAutocomplete, 100); // Try again in 100ms
+        return;
+    }
+
+    const addressInput = document.getElementById('ownerAddress');
+    if (!addressInput) {
+        console.error('Address input element not found');
+        return;
+    }
+
     try {
-        const addressInput = document.getElementById('ownerAddress');
-        if (!addressInput) {
-            console.error('Address input element not found');
-            return;
-        }
-
-        if (!google || !google.maps || !google.maps.places) {
-            console.error('Google Maps Places API not loaded');
-            return;
-        }
-
         const autocomplete = new google.maps.places.Autocomplete(addressInput, {
             types: ['address'],
             componentRestrictions: { country: 'us' }
         });
-        
-        // Add error handling for the listener
+
+        // Optional: Add a listener for when a place is selected
         autocomplete.addListener('place_changed', function() {
-            try {
-                const place = autocomplete.getPlace();
-                if (!place.geometry) {
-                    console.warn('Place details not found for input: ', addressInput.value);
-                    return;
-                }
-                fillInAddress(place);
-            } catch (error) {
-                console.error('Error in place_changed listener:', error);
+            const place = autocomplete.getPlace();
+            if (!place.geometry) {
+                console.log("No details available for input: '" + place.name + "'");
+                return;
             }
         });
 
-        // Remove autocomplete functionality if something goes wrong
-        addressInput.setAttribute('autocomplete', 'off');
-        
-        console.log('Autocomplete initialized successfully');
     } catch (error) {
         console.error('Error initializing autocomplete:', error);
-        handleMapError();
     }
 }
 

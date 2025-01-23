@@ -78,6 +78,42 @@ const Navigation = {
         }
     }
 };
+// Add this to your script.js
+function initMap() {
+    // Check if the required elements exist before initializing
+    if (!document.getElementById('ownerAddress')) {
+        console.warn('Address input element not found');
+        return;
+    }
+
+    try {
+        const autocomplete = new google.maps.places.Autocomplete(
+            document.getElementById('ownerAddress'),
+            {
+                types: ['address'],
+                componentRestrictions: { country: 'us' }
+            }
+        );
+
+        autocomplete.addListener('place_changed', function() {
+            const place = autocomplete.getPlace();
+            fillInAddress(place);
+        });
+    } catch (error) {
+        console.error('Error initializing Google Maps:', error);
+    }
+}
+
+// Add error handling for Google Maps loading
+window.gm_authFailure = function() {
+    console.error('Google Maps authentication failed. Please check your API key.');
+    // Optionally disable the address autocomplete and fall back to manual input
+    const addressInput = document.getElementById('ownerAddress');
+    if (addressInput) {
+        addressInput.removeAttribute('disabled');
+    }
+};
+
 // ===========================================
 // Google Maps Integration
 // ===========================================
@@ -90,12 +126,10 @@ window.initMap = function() {
 // Event Listeners
 // ===========================================
 document.addEventListener('DOMContentLoaded', () => {
-    DialogflowMessenger.init();
     Navigation.preventMenuClose();
 });
 
 window.addEventListener('load', () => {
-    DialogflowMessenger.refresh();
 });
 
 // Export any necessary functions or objects

@@ -113,6 +113,16 @@ window.gm_authFailure = function() {
         addressInput.removeAttribute('disabled');
     }
 };
+function loadGoogleMapsScript() {
+    const script = document.createElement('script');
+    script.src = `https://maps.googleapis.com/maps/api/js?key=${CONFIG.GOOGLE_MAPS_API_KEY}&libraries=places&callback=initMap`;
+    script.async = true;
+    script.defer = true;
+    document.head.appendChild(script);
+}
+
+document.addEventListener('DOMContentLoaded', loadGoogleMapsScript);
+
 
 // ===========================================
 // Google Maps Integration

@@ -1,32 +1,24 @@
-// ===========================================
-// Configuration and Constants
-// ===========================================
-const CONFIG = {
-    SHEETS: {
-        ID: "1fM11c84e-D01z3hbpjLLl2nRaL2grTkDEl5iGsJDLPw",
-        NAME: "Form Responses"
-    },
-    DIALOGFLOW: {
-        PROJECT_ID: 'ipr-roof-estimate-form-review',
-        LOCATION: 'us',
-        AGENT_ID: '5343493c-e057-445c-a767-86216ae1862d'
-    },
-    API: {
-        GOOGLE_APPS_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbwjjzqXnmM1wuw83CU6ZBr0zm1IhkrtlK8DEHHXeIurwf4J9jmCFcu6AUEWEx0zjTjK5Q/exec',
-        API_KEY: 'AIzaSyDFVaRrTxOyR-fX3XAOp1tjoeg58mkj254',
-        CLIENT_ID: '900437232674-krleqgjop3u7cl4sggmo20rkmrsl5vh5.apps.googleusercontent.com',
-        REDIRECT_URI: 'https://khaas01.github.io/IPR-estimate/',
-        SCOPES: ['https://www.googleapis.com/auth/drive', 'https://www.googleapis.com/auth/spreadsheets'].join(' ')
-    }
-};
+// Global variables
+let isSubmitting = false;
+let sectionHistory = []; // Initialize sectionHistory
+let currentEditRow = null;
+// Centralized API configuration
 
-// ===========================================
-// Global State Variables
-// ===========================================
-const state = {
-    isSubmitting: false,
-    sectionHistory: ['salesRepSection'],
-    currentEditRow: null
+const SHEET_ID = "1fM11c84e-D01z3hbpjLLl2nRaL2grTkDEl5iGsJDLPw";
+const SHEET_NAME = "Form Responses";
+
+const API_CONFIG = {
+    GOOGLE_APPS_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbwjjzqXnmM1wuw83CU6ZBr0zm1IhkrtlK8DEHHXeIurwf4J9jmCFcu6AUEWEx0zjTjK5Q/exec',
+    API_KEY: 'AIzaSyDFVaRrTxOyR-fX3XAOp1tjoeg58mkj254',
+    CLIENT_ID: '900437232674-krleqgjop3u7cl4sggmo20rkmrsl5vh5.apps.googleusercontent.com',
+    REDIRECT_URI: 'https://khaas01.github.io/IPR-estimate/',
+    SHEET_ID: SHEET_ID,
+    SHEET_NAME: SHEET_NAME,
+    API_ENDPOINT: `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${SHEET_NAME}`,
+    SCOPES: [
+        'https://www.googleapis.com/auth/drive',
+        'https://www.googleapis.com/auth/spreadsheets'
+    ].join(' ')
 };
 
 async function initializeGoogleAPIs() {
@@ -57,86 +49,6 @@ async function initializeGoogleAPIs() {
         return false;
     }
 }
-const Navigation = {
-    toggleMenu() {
-        const menuToggle = document.querySelector('.menu-toggle');
-        const navMenu = document.querySelector('.nav-menu');
-        menuToggle.classList.toggle('active');
-        navMenu.classList.toggle('active');
-    },
-
-    setupClickOutside() {
-        document.addEventListener('click', (event) => {
-            const navMenu = document.querySelector('.nav-menu');
-            const menuToggle = document.querySelector('.menu-toggle');
-            if (navMenu && navMenu.classList.contains('active') && 
-                !event.target.closest('.nav-container')) {
-                navMenu.classList.remove('active');
-                menuToggle.classList.remove('active');
-            }
-        });
-    },
-
-    preventMenuClose() {
-        const navContainer = document.querySelector('.nav-container');
-        if (navContainer) {
-            navContainer.addEventListener('click', (event) => {
-                event.stopPropagation();
-            });
-        }
-    }
-};
-// Add this to your script.js
-function initMap() {
-    try {
-        const addressInput = document.getElementById('ownerAddress');
-        if (!addressInput) {
-            console.warn('Address input element not found');
-            return;
-        }
-
-        const autocomplete = new google.maps.places.Autocomplete(addressInput, {
-            types: ['address'],
-            componentRestrictions: { country: 'us' }
-        });
-
-        autocomplete.addListener('place_changed', function() {
-            const place = autocomplete.getPlace();
-            if (!place.geometry) {
-                console.warn('Place details not found for input: ', addressInput.value);
-                return;
-            }
-            fillInAddress(place);
-        });
-    } catch (error) {
-        console.error('Error initializing Google Maps:', error);
-        handleMapError();
-    }
-}
-
-function handleMapError() {
-    const addressInput = document.getElementById('ownerAddress');
-    if (addressInput) {
-        addressInput.setAttribute('placeholder', 'Enter address manually');
-        // Remove autocomplete functionality
-        addressInput.setAttribute('autocomplete', 'off');
-    }
-}
-function loadGoogleMapsScript() {
-    const script = document.createElement('script');
-    script.src = `https://maps.googleapis.com/maps/api/js?key=${CONFIG.GOOGLE_MAPS_API_KEY}&libraries=places&callback=initMap`;
-    script.async = true;
-    script.defer = true;
-    document.head.appendChild(script);
-}
-
-document.addEventListener('DOMContentLoaded', loadGoogleMapsScript);
-
-
-// ===========================================
-// Event Listeners
-// ===========================================
-window.toggleMenu = Navigation.toggleMenu;
 function adjustIframeHeight() {
     const container = document.querySelector('.estimate-preview-container');
     const iframe = document.getElementById('estimatePreviewFrame');
@@ -177,7 +89,7 @@ window.addEventListener('load', adjustIframeHeight);
 window.addEventListener('resize', adjustIframeHeight);
 document.addEventListener('DOMContentLoaded', async function() {
     // Initialize section history
-    state.sectionHistory.push('salesRepSection');
+    sectionHistory.push('salesRepSection');
     // Show initial sales rep section only
     showSection('salesRepSection');
 });
@@ -243,6 +155,54 @@ solarRadios.forEach(radio => {
         }
     });
 });
+function initializeAutocomplete() {
+    const addressInput = document.getElementById('ownerAddress');
+    const autocomplete = new google.maps.places.Autocomplete(addressInput, {
+        // Restrict to getting just address components
+        types: ['address'],
+        // Restrict to USA addresses
+        componentRestrictions: { country: 'us' }
+    });
+    
+    autocomplete.addListener('place_changed', function() {
+        const place = autocomplete.getPlace();
+        if (!place.geometry) {
+            return;
+        }
+        
+        // Get only street address components
+        let streetNumber = '';
+        let streetName = '';
+        
+        for (const component of place.address_components) {
+            const type = component.types[0];
+            
+            if (type === 'street_number') {
+                streetNumber = component.long_name;
+            }
+            if (type === 'route') {
+                streetName = component.long_name;
+            }
+            // Still fill in the other fields
+            if (type === 'locality') {
+                document.getElementById('ownerCity').value = component.long_name;
+            }
+            if (type === 'administrative_area_level_1') {
+                document.getElementById('ownerState').value = component.short_name;
+            }
+            if (type === 'postal_code') {
+                document.getElementById('ownerZip').value = component.long_name;
+            }
+        }
+        
+        // Set only the street address in the address field
+        const streetAddress = `${streetNumber} ${streetName}`.trim();
+        addressInput.value = streetAddress;
+    });
+}
+
+// Initialize when the page loads
+document.addEventListener('DOMContentLoaded', initializeAutocomplete);
 
 // Helper function to fill in address components
 function fillInAddress(place) {
@@ -278,6 +238,9 @@ function fillInAddress(place) {
     }
 }
 
+// Initialize autocomplete when page loads
+document.addEventListener('DOMContentLoaded', initializeAutocomplete);
+// Function to hide all sections - keep it simple and efficient
 function hideAllSections() {
     console.log('Hiding all sections');
     document.querySelectorAll('div[id$="Section"], div[id*="-section"]').forEach(section => {
@@ -1211,5 +1174,3 @@ async function getDecodedServiceAccountCredentials() {
         throw new Error('Failed to initialize service account credentials');
     }
 }
-
-

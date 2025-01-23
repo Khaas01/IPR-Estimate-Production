@@ -78,6 +78,28 @@ const Navigation = {
         }
     }
 };
+// ===========================================
+// Google Maps Integration
+// ===========================================
+window.initMap = function() {
+    console.log('Google Maps API loaded successfully');
+    initializeAutocomplete();
+};
+
+// ===========================================
+// Event Listeners
+// ===========================================
+document.addEventListener('DOMContentLoaded', () => {
+    DialogflowMessenger.init();
+    Navigation.preventMenuClose();
+});
+
+window.addEventListener('load', () => {
+    DialogflowMessenger.refresh();
+});
+
+// Export any necessary functions or objects
+window.toggleMenu = Navigation.toggleMenu;
 function adjustIframeHeight() {
     const container = document.querySelector('.estimate-preview-container');
     const iframe = document.getElementById('estimatePreviewFrame');

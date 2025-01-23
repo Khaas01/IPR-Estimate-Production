@@ -81,11 +81,6 @@ function initMap() {
     }, 100);
 }
 
-// Add this to your HTML file:
-<script> async defer
-    src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=places&callback=initMap"
-    onerror="handleMapError()">
-</script>
 function toggleMenu() {
     const navMenu = document.querySelector('.nav-menu');
     const menuToggle = document.querySelector('.menu-toggle');

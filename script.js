@@ -744,7 +744,7 @@ function submitForm() {
     
     try {
         isSubmitting = true;
-        showLoading('Submitting form...');
+        showLoading('Creating your estimate, hang on......');
 
         const formData = collectFormData();
         

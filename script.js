@@ -49,93 +49,98 @@ async function initializeGoogleAPIs() {
         return false;
     }
 }
-// Replace your current initMap function with this:
 function initMap() {
-    // Delay the initialization slightly to ensure DOM is ready
-    setTimeout(() => {
-        const addressInput = document.getElementById('ownerAddress');
-        if (!addressInput) {
-            console.warn('Address input not found, skipping autocomplete initialization');
-            return;
-        }
-
-        try {
-            const autocomplete = new google.maps.places.Autocomplete(addressInput, {
-                types: ['address'],
-                componentRestrictions: { country: 'us' }
-            });
-
-            autocomplete.addListener('place_changed', function() {
-                const place = autocomplete.getPlace();
-                if (!place.geometry) {
-                    console.warn('No place details available');
-                    return;
-                }
-                fillInAddress(place);
-            });
-
-        } catch (error) {
-            console.error('Failed to initialize Places Autocomplete:', error);
-            handleMapError();
-        }
-    }, 100);
-}
-function fillInAddress(place) {
-    // Get the street number and route components
-    let streetNumber = '';
-    let streetName = '';
-    
-    // Extract address components
-    for (const component of place.address_components) {
-        if (component.types[0] === 'street_number') {
-            streetNumber = component.long_name;
-        }
-        if (component.types[0] === 'route') {
-            streetName = component.long_name;
-        }
-        // Still fill in the other form fields
-        if (component.types[0] === 'locality') {
-            document.getElementById('ownerCity').value = component.long_name;
-        }
-        if (component.types[0] === 'administrative_area_level_1') {
-            document.getElementById('ownerState').value = component.short_name;
-        }
-        if (component.types[0] === 'postal_code') {
-            document.getElementById('ownerZip').value = component.long_name;
-        }
+    // Wait for DOM to be ready
+    if (document.readyState !== 'complete') {
+        window.addEventListener('load', initMap);
+        return;
     }
 
-    // Format the street name with abbreviations
-    streetName = streetName
-        // Handle directionals at start of street name
-        .replace(/^North /i, 'N ')
-        .replace(/^South /i, 'S ')
-        .replace(/^East /i, 'E ')
-        .replace(/^West /i, 'W ')
-        // Handle directionals within the street name
-        .replace(/ North /i, ' N ')
-        .replace(/ South /i, ' S ')
-        .replace(/ East /i, ' E ')
-        .replace(/ West /i, ' W ')
-        // Handle common street types
-        .replace(/ Street$/i, ' St')
-        .replace(/ Avenue$/i, ' Ave')
-        .replace(/ Road$/i, ' Rd')
-        .replace(/ Boulevard$/i, ' Blvd')
-        .replace(/ Lane$/i, ' Ln')
-        .replace(/ Drive$/i, ' Dr')
-        .replace(/ Court$/i, ' Ct')
-        .replace(/ Circle$/i, ' Cir')
-        .replace(/ Place$/i, ' Pl')
-        .replace(/ Square$/i, ' Sq')
-        .replace(/ Parkway$/i, ' Pkwy')
-        .replace(/ Highway$/i, ' Hwy')
-        .trim();
+    const addressInput = document.getElementById('ownerAddress');
+    if (!addressInput) {
+        console.warn('Address input not found');
+        return;
+    }
 
-    // Set only the street address in the address field
-    const streetAddress = `${streetNumber} ${streetName}`.trim();
-    document.getElementById('ownerAddress').value = streetAddress;
+    try {
+        const autocomplete = new google.maps.places.Autocomplete(addressInput, {
+            types: ['address'],
+            componentRestrictions: { country: 'us' },
+            fields: ['address_components', 'formatted_address', 'geometry']
+        });
+
+        autocomplete.addListener('place_changed', function() {
+            const place = autocomplete.getPlace();
+            if (!place.address_components) {
+                console.warn('No address details available');
+                return;
+            }
+
+            let streetNumber = '';
+            let streetName = '';
+            
+            // Extract address components
+            for (const component of place.address_components) {
+                const type = component.types[0];
+                
+                switch(type) {
+                    case 'street_number':
+                        streetNumber = component.long_name;
+                        break;
+                    case 'route':
+                        streetName = component.long_name;
+                        break;
+                    case 'locality':
+                        document.getElementById('ownerCity').value = component.long_name;
+                        break;
+                    case 'administrative_area_level_1':
+                        document.getElementById('ownerState').value = component.short_name;
+                        break;
+                    case 'postal_code':
+                        document.getElementById('ownerZip').value = component.short_name;
+                        break;
+                }
+            }
+
+            // Format street name with abbreviations
+            streetName = streetName
+                // Directionals at start
+                .replace(/^North /i, 'N ')
+                .replace(/^South /i, 'S ')
+                .replace(/^East /i, 'E ')
+                .replace(/^West /i, 'W ')
+                // Directionals within name
+                .replace(/ North /i, ' N ')
+                .replace(/ South /i, ' S ')
+                .replace(/ East /i, ' E ')
+                .replace(/ West /i, ' W ')
+                // Street types
+                .replace(/ Street$/i, ' St')
+                .replace(/ Avenue$/i, ' Ave')
+                .replace(/ Road$/i, ' Rd')
+                .replace(/ Boulevard$/i, ' Blvd')
+                .replace(/ Lane$/i, ' Ln')
+                .replace(/ Drive$/i, ' Dr')
+                .replace(/ Court$/i, ' Ct')
+                .replace(/ Circle$/i, ' Cir')
+                .replace(/ Place$/i, ' Pl')
+                .replace(/ Square$/i, ' Sq')
+                .replace(/ Parkway$/i, ' Pkwy')
+                .replace(/ Highway$/i, ' Hwy')
+                .trim();
+
+            // Set only the street address in the address field
+            document.getElementById('ownerAddress').value = `${streetNumber} ${streetName}`.trim();
+        });
+
+    } catch (error) {
+        console.error('Failed to initialize Places Autocomplete:', error);
+        handleMapError();
+    }
 }
+
+// Make initMap available globally
+window.initMap = initMap;
 function toggleMenu() {
     const navMenu = document.querySelector('.nav-menu');
     const menuToggle = document.querySelector('.menu-toggle');
@@ -271,28 +276,7 @@ solarRadios.forEach(radio => {
         }
     });
 });
-function initializeAutocomplete() {
-    const addressInput = document.getElementById('ownerAddress');
-    if (!addressInput) {
-        console.warn('Address input not found');
-        return;
-    }
 
-    const autocomplete = new google.maps.places.Autocomplete(addressInput, {
-        types: ['address'],
-        componentRestrictions: { country: 'us' },
-        fields: ['address_components', 'formatted_address', 'geometry']
-    });
-
-    autocomplete.addListener('place_changed', function() {
-        const place = autocomplete.getPlace();
-        if (!place.geometry || !place.address_components) {
-            console.warn('No address details available for this selection');
-            return;
-        }
-        fillInAddress(place);
-    });
-}
 function handleMapError() {
     const addressInput = document.getElementById('ownerAddress');
     if (addressInput) {
@@ -335,9 +319,6 @@ function fillInAddress(place) {
     }
 }
 
-// Initialize autocomplete when page loads
-document.addEventListener('DOMContentLoaded', initializeAutocomplete);
-// Function to hide all sections - keep it simple and efficient
 function hideAllSections() {
     console.log('Hiding all sections');
     document.querySelectorAll('div[id$="Section"], div[id*="-section"]').forEach(section => {

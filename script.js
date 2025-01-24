@@ -80,7 +80,62 @@ function initMap() {
         }
     }, 100);
 }
+function fillInAddress(place) {
+    // Get the street number and route components
+    let streetNumber = '';
+    let streetName = '';
+    
+    // Extract address components
+    for (const component of place.address_components) {
+        if (component.types[0] === 'street_number') {
+            streetNumber = component.long_name;
+        }
+        if (component.types[0] === 'route') {
+            streetName = component.long_name;
+        }
+        // Still fill in the other form fields
+        if (component.types[0] === 'locality') {
+            document.getElementById('ownerCity').value = component.long_name;
+        }
+        if (component.types[0] === 'administrative_area_level_1') {
+            document.getElementById('ownerState').value = component.short_name;
+        }
+        if (component.types[0] === 'postal_code') {
+            document.getElementById('ownerZip').value = component.long_name;
+        }
+    }
 
+    // Format the street name with abbreviations
+    streetName = streetName
+        // Handle directionals at start of street name
+        .replace(/^North /i, 'N ')
+        .replace(/^South /i, 'S ')
+        .replace(/^East /i, 'E ')
+        .replace(/^West /i, 'W ')
+        // Handle directionals within the street name
+        .replace(/ North /i, ' N ')
+        .replace(/ South /i, ' S ')
+        .replace(/ East /i, ' E ')
+        .replace(/ West /i, ' W ')
+        // Handle common street types
+        .replace(/ Street$/i, ' St')
+        .replace(/ Avenue$/i, ' Ave')
+        .replace(/ Road$/i, ' Rd')
+        .replace(/ Boulevard$/i, ' Blvd')
+        .replace(/ Lane$/i, ' Ln')
+        .replace(/ Drive$/i, ' Dr')
+        .replace(/ Court$/i, ' Ct')
+        .replace(/ Circle$/i, ' Cir')
+        .replace(/ Place$/i, ' Pl')
+        .replace(/ Square$/i, ' Sq')
+        .replace(/ Parkway$/i, ' Pkwy')
+        .replace(/ Highway$/i, ' Hwy')
+        .trim();
+
+    // Set only the street address in the address field
+    const streetAddress = `${streetNumber} ${streetName}`.trim();
+    document.getElementById('ownerAddress').value = streetAddress;
+}
 function toggleMenu() {
     const navMenu = document.querySelector('.nav-menu');
     const menuToggle = document.querySelector('.menu-toggle');

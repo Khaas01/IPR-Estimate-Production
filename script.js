@@ -272,39 +272,27 @@ solarRadios.forEach(radio => {
     });
 });
 function initializeAutocomplete() {
-    // Wait for Google Maps API to be fully loaded
-    if (typeof google === 'undefined' || !google.maps || !google.maps.places) {
-        console.log('Waiting for Google Maps API to load...');
-        setTimeout(initializeAutocomplete, 100); // Try again in 100ms
-        return;
-    }
-
     const addressInput = document.getElementById('ownerAddress');
     if (!addressInput) {
-        console.error('Address input element not found');
+        console.warn('Address input not found');
         return;
     }
 
-    try {
-        const autocomplete = new google.maps.places.Autocomplete(addressInput, {
-            types: ['address'],
-            componentRestrictions: { country: 'us' }
-        });
+    const autocomplete = new google.maps.places.Autocomplete(addressInput, {
+        types: ['address'],
+        componentRestrictions: { country: 'us' },
+        fields: ['address_components', 'formatted_address', 'geometry']
+    });
 
-        // Optional: Add a listener for when a place is selected
-        autocomplete.addListener('place_changed', function() {
-            const place = autocomplete.getPlace();
-            if (!place.geometry) {
-                console.log("No details available for input: '" + place.name + "'");
-                return;
-            }
-        });
-
-    } catch (error) {
-        console.error('Error initializing autocomplete:', error);
-    }
+    autocomplete.addListener('place_changed', function() {
+        const place = autocomplete.getPlace();
+        if (!place.geometry || !place.address_components) {
+            console.warn('No address details available for this selection');
+            return;
+        }
+        fillInAddress(place);
+    });
 }
-
 function handleMapError() {
     const addressInput = document.getElementById('ownerAddress');
     if (addressInput) {
